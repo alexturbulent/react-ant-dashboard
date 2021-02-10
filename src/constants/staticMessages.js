@@ -1,0 +1,1 @@
+export const SMTH_WENT_WRONG = "Something went wrong, we sorry";
