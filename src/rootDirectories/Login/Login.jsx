@@ -1,123 +1,154 @@
 import React, { useState } from "react";
-import { Row, Col, Form, Input, Button, Typography, message } from "antd";
+import { Row, Col, Form, Input, Button, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 /* HOST */
-// import { loginUser } from "../../server/config";
+import { loginUser } from "../../server/config";
 
 /* FUNCTIONS */
 import { setCookie } from "../../utils/useCookies";
-// import { setRequestHeader } from "../../server/host";
 
 /* STYLES */
 import "../../index.scss";
 import "./login.scss";
 
 /* CONSTANTS */
-import {
-    userAccessTokenName,
-    APP_VERSION,
-} from "../../constants";
+import { userAccessTokenName } from "../../constants";
 
-const { Title } = Typography;
+/* COMPONENTS */
+import LoginTopHeader from "./components/LoginTopHeader";
+import { connect } from "react-redux";
 
-const Login = () => {
-    const [login, setLogin] = useState('');
-    const [password, setPassword] = useState('');
+const getCurrentYear = () => {
+    const date = new Date();
+    return date.getFullYear();
+}
+
+const Login = (props) => {
+    const [username, setUsername] = useState(null);
+    const [password, setPassword] = useState(null);
     const [isSubmitting, setSubmitting] = useState(false);
-    const [form] = Form.useForm();
 
-    const submitLogin = () => {
+    const [loginForm] = Form.useForm();
+
+    const { langs, lang } = props;
+    const content = langs[lang];
+
+    const handleUsernameChange = (e) => setUsername(e.target.value);
+
+    const handlePasswordChange = (e) => setPassword(e.target.value);
+
+    const onFinish = () => {
         setSubmitting(true);
-        
-        if (login === 'test' && password === "123") {
-            setCookie(userAccessTokenName, true);
-            window.location = "/dashboard";
-        } else {
-            form.resetFields();
-            setPassword('');
-            setLogin('');
-            setSubmitting(false);
-            message.error("Login or password is incorrect!");
-        }
 
-        // Request to log in
-        // loginUser({ login, password }).then((res) => {
-        //     if (res && res.status === 200) {
-        //         setCookie(userAccessTokenName, res.data.cookieProp);
-        //         setRequestHeader(res.data);
-        //         window.location = "/dashboard";
-        //     } else {
-        //         form.resetFields();
-        //         setPassword('');
-        //         setLogin('');
-        //         setSubmitting(false);
-        //     }
-        // })
+        loginUser({
+            username,
+            password,
+        }).then((res) => {
+            if (res && res.status === 200 && res.data) {
+                setCookie(userAccessTokenName, res.data.token)
+                window.location = "/dashboard";
+            } else {
+                message.error("Something went wrong!")
+                loginForm.resetFields();
+                setSubmitting(false);
+            }
+        })
     }
 
     return (
-        <React.Fragment>
-            <div className="version-box">
-                <p>v - {APP_VERSION}</p>
-            </div>
-            <Row justify="center" align="middle" style={{ height: "100vh" }}>
-                <Col xs={20} sm={12} md={8} lg={4}>
-                    <Title level={3} className="text-center">Project name</Title>
+        <Row className="login-row">
+            <Col xs={24} sm={12} md={12} lg={7} className="login-left">
+                <Row justify="space-between" style={{ height: "100%" }}>
+                    <Col span={24}>
+                        <LoginTopHeader />
+                        <Row align="bottom" justify="center" className="welcome-section">
+                            <Col>
+                                <h2>Welcome</h2>
+                                <p>This is a subtitle in login page</p>
+                            </Col>
+                        </Row>
+                    </Col>
 
-                    <Form
-                        name="basic"
-                        form={form}
-                        onFinish={submitLogin}
-
-                    >
-                        <Form.Item
-                            name="login"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input your login!",
-                                },
-                            ]}
+                    <Col span={24}>
+                        <Form
+                            form={loginForm}
+                            name="basic"
+                            className="login-form"
+                            onFinish={onFinish}
                         >
-                            <Input
-                                name="login"
-                                autoFocus
-                                prefix={<UserOutlined className="site-form-item-icon" />}
-                                placeholder="Login"
-                                disabled={isSubmitting}
-                                onChange={(e) => setLogin(e.target.value)}
-                            />
-                        </Form.Item>
+                            <Form.Item
+                                name="username"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: content.please_add_login,
+                                    },
+                                ]}
+                            >
+                                <Input
+                                    autoFocus
+                                    prefix={<UserOutlined className="site-form-item-icon" />}
+                                    name="username"
+                                    placeholder={content.username}
+                                    onChange={handleUsernameChange}
+                                    disabled={isSubmitting}
+                                />
+                            </Form.Item>
 
-                        <Form.Item
-                            name="password"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input your password!",
-                                },
-                            ]}
-                        >
-                            <Input.Password
+                            <Form.Item
                                 name="password"
-                                prefix={<LockOutlined className="site-form-item-icon" />}
-                                placeholder="Password"
-                                disabled={isSubmitting}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </Form.Item>
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: content.please_add_password,
+                                    },
+                                ]}
+                            >
+                                <Input.Password
+                                    prefix={<LockOutlined className="site-form-item-icon" />}
+                                    name="password"
+                                    placeholder={content.password}
+                                    onChange={handlePasswordChange}
+                                    disabled={isSubmitting}
+                                />
+                            </Form.Item>
 
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit" className="float-right" disabled={isSubmitting} loading={isSubmitting}>
-                                Submit
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </Col>
-            </Row>
-        </React.Fragment>
+                            <Form.Item>
+                                <Button htmlType="submit" className="submit-btn" disabled={isSubmitting} loading={isSubmitting}>
+                                    {content.login_submit}
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </Col>
+
+                    <Col span={24}>
+                        <Row style={{ height: "100%" }} justify="center" align="bottom">
+                            <Col>{content.all_right_reserved} {getCurrentYear()}</Col>
+                        </Row>
+                    </Col>
+                </Row>
+
+
+            </Col>
+
+            <Col xs={24} sm={12} md={12} lg={17} className="login-right">
+                <Row justify="center" align="middle" style={{ height: "100%" }}>
+                    <Col className="glass-box">
+                        <h2>Give a man a fish and you feed him for a day; teach a man to fish and you feed him for a lifetime.</h2>
+                        <p>Exemplary word</p>
+                    </Col>
+                </Row>
+            </Col>
+        </Row>
     )
 }
 
-export default Login;
+const mapStateToProps = (state) => {
+    return {
+        lang: state.lang,
+        langs: state.langs,
+    }
+}
+
+export default connect(mapStateToProps)(Login);

@@ -97,6 +97,9 @@ export const labels_ru = {
     pop_confirm_title: "Вы уверены?",
 
     // Common form labels
+    username: "Логин",
+    login_submit: "Войти",
+    all_right_reserved: "Все права зашишено",
     add_modal_heading: "Добавить новый",
     edit_modal_heading: "Редактировать",
     delete_modal_heading: "Удалить",
@@ -180,4 +183,6 @@ export const labels_ru = {
 
     // Messages
     message_img_uploaded: "Изображение загружено",
+    please_add_login: "Пожалуйста, добавьте логин!",
+    please_add_password: "Пожалуйста, добавьте пароль!",
 }

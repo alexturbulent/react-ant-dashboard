@@ -97,6 +97,9 @@ export const labels_uz = {
     pop_confirm_title: "Ishonchingiz komilmi?",
 
     // Common form labels
+    username: "Login",
+    login_submit: "Kirish",
+    all_right_reserved: "Barcha huquqlar himoyalangan",
     add_modal_heading: "Yangi qo'shish",
     edit_modal_heading: "Tahrirlash",
     delete_modal_heading: "O'chirish",
@@ -180,4 +183,6 @@ export const labels_uz = {
     
     // Messages
     message_img_uploaded: "Rasm yuklandi",
+    please_add_login: "Iltimos, loginni kiriting!",
+    please_add_password: "Iltimos, parolni kiriting!",
 }
